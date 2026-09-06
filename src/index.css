@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: 'Cormorant Garamond', 'Cinzel', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --color-gold: #c5a059;
+    --color-bg: #050505;
+    --color-surface: #0a0a0a;
+    --color-surface-hover: #111111;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #050505;
+    color: #f5f2ed;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: var(--font-serif);
+  }
+}
+
+/* Bold Typography micro-utilities */
+.tracking-widest-pro {
+  letter-spacing: 0.25em;
+}
+
+.tracking-super {
+  letter-spacing: 0.4em;
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f1f1f;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
