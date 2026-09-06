@@ -15,6 +15,7 @@ import { SupabaseModal } from "./components/SupabaseModal";
 import { CollaborationRequestModal } from "./components/CollaborationRequestModal";
 import { CollaborationRequestsHub } from "./components/CollaborationRequestsHub";
 import { PerformanceDashboard } from "./components/PerformanceDashboard";
+import { SupabaseTableView } from "./components/SupabaseTableView";
 import {
   Creator,
   CollaborationDeal,
@@ -35,6 +36,7 @@ import {
   loadLocalState,
   syncToSupabase,
 } from "./lib/supabaseClient";
+import { getStoredYouTubeKey } from "./lib/youtubeClient";
 import { ShieldCheck, Sparkles, Youtube, Database, ExternalLink, ArrowRight } from "lucide-react";
 
 const LOCAL_STORAGE_KEY_REQUESTS = "ciphercollab_requests_v1";
@@ -114,7 +116,15 @@ export default function App() {
   const handlePerformYouTubeLiveSearch = async (query: string) => {
     setIsSearchingYouTube(true);
     try {
-      const res = await fetch(`/api/youtube/search?q=${encodeURIComponent(query)}`);
+      const storedKey = getStoredYouTubeKey();
+      const headers: Record<string, string> = {};
+      if (storedKey) {
+        headers["x-youtube-key"] = storedKey;
+      }
+
+      const res = await fetch(`/api/youtube/search?q=${encodeURIComponent(query)}`, {
+        headers,
+      });
       const data = await res.json();
       if (data.creators && data.creators.length > 0) {
         // Merge with existing list if new
@@ -424,6 +434,18 @@ export default function App() {
             onUpdateDeal={handleUpdateDeal}
           />
         )}
+
+        {activeTab === "database" && (
+          <SupabaseTableView
+            creators={creators}
+            deals={deals}
+            requests={requests}
+            campaigns={campaigns}
+            config={supabaseConfig}
+            onSaveConfig={handleSaveSupabaseConfig}
+            onDataImported={handleDataImported}
+          />
+        )}
       </main>
 
       {/* Creator Detail Dossier Modal */}
@@ -458,6 +480,8 @@ export default function App() {
         onSaveConfig={handleSaveSupabaseConfig}
         creators={creators}
         deals={deals}
+        requests={requests}
+        campaigns={campaigns}
         onDataImported={handleDataImported}
       />
 

@@ -19,6 +19,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { CampaignKPI, Creator } from "../types";
+import { getStoredYouTubeKey } from "../lib/youtubeClient";
 
 interface PerformanceDashboardProps {
   campaigns: CampaignKPI[];
@@ -87,7 +88,11 @@ export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
         ? `videoId=${encodeURIComponent(campaign.youtubeVideoId)}`
         : `videoUrl=${encodeURIComponent(campaign.youtubeVideoUrl || "")}`;
 
-      const res = await fetch(`/api/youtube/video-stats?${query}`);
+      const storedYtKey = getStoredYouTubeKey();
+      const headers: Record<string, string> = {};
+      if (storedYtKey) headers["x-youtube-key"] = storedYtKey;
+
+      const res = await fetch(`/api/youtube/video-stats?${query}`, { headers });
       const data = await res.json();
 
       if (data.views !== undefined) {

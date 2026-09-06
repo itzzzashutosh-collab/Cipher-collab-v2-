@@ -23,7 +23,8 @@ export type NavTabType =
   | "deal-room"
   | "creator-portal"
   | "requests"
-  | "performance";
+  | "performance"
+  | "database";
 
 interface NavbarProps {
   activeTab: NavTabType;
@@ -190,6 +191,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab("database")}
+            className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium transition-all relative ${
+              activeTab === "database"
+                ? "border border-[#3ECF8E] bg-[#3ECF8E]/10 text-[#3ECF8E]"
+                : "text-[#f5f2ed]/60 hover:text-[#f5f2ed] border border-transparent"
+            }`}
+            title="View PostgreSQL Relational Tables in Supabase"
+          >
+            <Database className="h-3.5 w-3.5 text-[#3ECF8E]" />
+            <span className="font-semibold">Supabase Tables</span>
+            <span className="flex h-3.5 px-1 items-center justify-center rounded-full bg-[#3ECF8E]/20 text-[#3ECF8E] text-[9px] font-bold">
+              4
+            </span>
+          </button>
+
+          <button
             onClick={() => {
               setActiveTab("creator-portal");
               setPerspective("creator");
@@ -219,19 +236,20 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Supabase Storage Integration Badge & Trigger */}
           <button
-            onClick={onOpenSupabaseModal}
+            onClick={() => setActiveTab("database")}
             className={`flex items-center gap-1.5 rounded-sm border px-3 py-2 text-[10px] uppercase tracking-wider font-medium transition-all ${
               supabaseConfig.isConnected
                 ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
                 : "border-white/10 bg-[#0a0a0a] text-[#f5f2ed]/60 hover:border-white/20 hover:text-[#f5f2ed]"
             }`}
+            title="Open Supabase Cloud Database Explorer"
           >
             <Database className="h-3.5 w-3.5 text-[#3ECF8E]" />
             <span className="hidden sm:inline">Supabase</span>
             {supabaseConfig.isConnected ? (
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             ) : (
-              <span className="text-[9px] text-[#f5f2ed]/40">Sync</span>
+              <span className="text-[9px] text-[#f5f2ed]/40">4 Tables</span>
             )}
           </button>
         </div>

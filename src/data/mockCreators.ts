@@ -4,6 +4,10 @@ import {
   INITIAL_COLLABORATION_REQUESTS,
   INITIAL_CAMPAIGN_KPIS,
 } from "./mockEnhancedData";
+import { TECH_CREATORS } from "./creatorsTech";
+import { FINANCE_CREATORS } from "./creatorsFinance";
+import { LUXURY_CREATORS } from "./creatorsLuxury";
+import { LIFESTYLE_CREATORS } from "./creatorsLifestyle";
 
 const RAW_CREATORS = [
   {
@@ -932,7 +936,15 @@ const RAW_CREATORS = [
   },
 ];
 
-export const INITIAL_CREATORS: Creator[] = RAW_CREATORS.map((c) => {
+// Pre-populate modular creators
+const ALL_EXPANDED_CREATORS: Creator[] = [
+  ...TECH_CREATORS,
+  ...FINANCE_CREATORS,
+  ...LUXURY_CREATORS,
+  ...LIFESTYLE_CREATORS,
+];
+
+const mappedRawCreators: Creator[] = RAW_CREATORS.map((c) => {
   const enhancement = CREATOR_PROFILE_ENHANCEMENTS[c.id] || {
     pastCollaborations: [
       {
@@ -969,6 +981,17 @@ export const INITIAL_CREATORS: Creator[] = RAW_CREATORS.map((c) => {
     audienceDemographics: enhancement.audienceDemographics,
   } as Creator;
 });
+
+// Deduplicate by ID and preserve expanded high-fidelity models
+const creatorMap = new Map<string, Creator>();
+ALL_EXPANDED_CREATORS.forEach((c) => creatorMap.set(c.id, c));
+mappedRawCreators.forEach((c) => {
+  if (!creatorMap.has(c.id)) {
+    creatorMap.set(c.id, c);
+  }
+});
+
+export const INITIAL_CREATORS: Creator[] = Array.from(creatorMap.values());
 
 export const INITIAL_COLLABORATION_DEALS = [
   {
