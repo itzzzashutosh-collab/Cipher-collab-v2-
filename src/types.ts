@@ -101,6 +101,7 @@ export interface Creator {
     primaryLocation: string;
     keyInterests: string[];
   };
+  marketplaceIntelligence?: CreatorMarketplaceIntelligence;
 }
 
 export interface DealMilestone {
@@ -269,5 +270,77 @@ export interface CampaignKPI {
   lastSyncedAt: string;
   syncSource: "YouTube Data API v3" | "Manual Input" | "Verified Escrow Link";
   notes?: string;
+}
+
+// ----------------------------------------------------
+// Marketplace Intelligence & Analytical Data Types
+// ----------------------------------------------------
+export interface EngagementGrowthTrend {
+  period: string; // e.g. "30d", "60d", "90d", "180d" or month
+  engagementRate: number; // e.g. 5.8
+  viewVelocity: number; // daily views or avg views per release
+  growthRatePct: number; // e.g. +14.2%
+  uploadFrequencyMonthly: number;
+  sentimentIndex: number; // 0 - 100 positive reaction score
+}
+
+export interface AudienceOverlapPeer {
+  peerCreatorId: string;
+  peerName: string;
+  peerHandle: string;
+  peerNiche: CreatorNiche;
+  peerAvatarUrl?: string;
+  overlapPercentage: number; // 0 - 100
+  sharedAudienceEstimate: number;
+  exclusiveAudienceEstimate: number;
+  affinityIndex: number; // baseline 1.0, e.g. 2.8x higher than average
+  sharedDemographicHighlights: string[];
+}
+
+export interface ContentFormatPerformance {
+  format: "Deep Dive (>15m)" | "Standard Integration (8-15m)" | "Shorts (<60s)" | "Live & Premiere";
+  shareOfUploadsPct: number;
+  avgViews: number;
+  avgEngagementRate: number;
+  sponsoredRetentionRate: number; // retention % on branded segments vs overall video
+}
+
+export interface CreatorMarketplaceIntelligence {
+  creatorId: string;
+  channelId: string;
+  dataSource: "live_youtube_api" | "verified_statistical_benchmark";
+  lastAnalyzedAt: string;
+  confidenceScore: number; // 0 - 100
+  growthTrends: {
+    thirtyDayEngagementRate: number;
+    sixtyDayEngagementRate: number;
+    ninetyDayEngagementRate: number;
+    trailingVelocityViews: number; // 30-day average daily velocity
+    subscriberVelocityMonthly: number; // monthly net new subscribers
+    velocityMomentum: "Accelerating" | "Stable High" | "Plateau" | "Regrouping";
+    historicalGrowth: EngagementGrowthTrend[];
+  };
+  audienceOverlap: {
+    primaryCohortSummary: string;
+    crossNicheAffinityRank: string;
+    nicheClusterOverlapRate: number; // average overlap within same niche %
+    cannibalizationRisk: "Very Low" | "Low" | "Moderate" | "High";
+    topOverlapPeers: AudienceOverlapPeer[];
+  };
+  contentIntelligence: {
+    formats: ContentFormatPerformance[];
+    optimalUploadSchedule: {
+      bestDayOfWeek: string;
+      bestTimeUtc: string;
+      audienceActiveWindow: string;
+    };
+    commercialEfficiency: {
+      organicBaselineRatio: number; // ratio of sponsored view performance to organic (e.g. 0.98)
+      cpmFairMarketEstimate: number; // calculated dollar value
+      brandSafetyScore: number; // 0 - 100
+      sponsoredSaturationPct: number; // % of videos in last 6 months that carried a sponsor
+    };
+  };
+  executiveIntelligenceSummary: string;
 }
 
