@@ -690,6 +690,25 @@ app.get("/api/youtube/video-stats", async (req, res) => {
 });
 
 // ----------------------------------------------------
+// API: Export Creators Marketplace Intelligence CSV
+// ----------------------------------------------------
+app.get("/api/creators/export-csv", (req, res) => {
+  const csvPath = path.join(process.cwd(), "src/data/creators_marketplace_intelligence.csv");
+  if (fs.existsSync(csvPath)) {
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", "attachment; filename=ciphercollab_creators_intelligence.csv");
+    return res.sendFile(csvPath);
+  }
+  const publicCsvPath = path.join(process.cwd(), "public/creators_marketplace_intelligence.csv");
+  if (fs.existsSync(publicCsvPath)) {
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", "attachment; filename=ciphercollab_creators_intelligence.csv");
+    return res.sendFile(publicCsvPath);
+  }
+  return res.status(404).json({ error: "Creators CSV dataset not found." });
+});
+
+// ----------------------------------------------------
 // API: YouTube Marketplace Intelligence Service
 // Fetches deep analytical data (engagement growth trends, audience overlap, format performance)
 // ----------------------------------------------------

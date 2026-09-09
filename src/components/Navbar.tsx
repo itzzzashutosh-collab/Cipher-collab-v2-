@@ -14,10 +14,13 @@ import {
   ExternalLink,
   Inbox,
   BarChart3,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react";
 import { SupabaseConfigState } from "../types";
 
 export type NavTabType =
+  | "landing"
   | "directory"
   | "decision-engine"
   | "deal-room"
@@ -66,39 +69,46 @@ export const Navbar: React.FC<NavbarProps> = ({
       .catch(() => {});
   }, []);
 
+  const handleDownloadCsv = () => {
+    window.location.href = "/api/creators/export-csv";
+  };
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#050505]/95 backdrop-blur-md">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand & Monogram - Bold Typography Theme */}
+    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl">
+      <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Brand & Monogram - Ultra-Modern Typography */}
         <div className="flex items-center gap-6">
           <div
-            onClick={() => setActiveTab("directory")}
-            className="flex cursor-pointer items-center gap-3 transition-opacity hover:opacity-90"
+            onClick={() => setActiveTab("landing")}
+            className="flex cursor-pointer items-center gap-3 transition-opacity hover:opacity-90 group"
           >
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#6C5CE7] to-[#5B21B6] text-xs font-bold text-white shadow-md shadow-[#6C5CE7]/30 group-hover:scale-105 transition-transform">
+              C
+            </div>
             <div>
-              <div className="text-2xl tracking-tighter font-serif font-light text-[#f5f2ed]">
-                CIPHER<span className="font-bold text-[#c5a059]">COLLAB</span>
+              <div className="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+                CIPHER<span className="text-[#6C5CE7]">COLLAB</span>
               </div>
-              <p className="text-[9px] uppercase tracking-[0.3em] font-medium text-[#f5f2ed]/50 -mt-0.5">
-                Creator Economy Infrastructure
+              <p className="text-[9px] uppercase tracking-[0.2em] font-medium text-[#A1A1AA] -mt-0.5">
+                Institutional Infrastructure
               </p>
             </div>
           </div>
 
           {/* Perspective Switcher */}
-          <div className="hidden lg:flex items-center rounded-sm border border-white/10 bg-[#0a0a0a] p-0.5">
+          <div className="hidden lg:flex items-center rounded-lg border border-white/10 bg-black/40 p-0.5">
             <button
               onClick={() => {
                 setPerspective("brand");
                 if (activeTab === "creator-portal") setActiveTab("directory");
               }}
-              className={`flex items-center gap-1.5 rounded-sm px-3 py-1 text-[10px] uppercase tracking-[0.15em] font-medium transition-all ${
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-all ${
                 perspective === "brand"
-                  ? "bg-[#c5a059] text-black font-semibold shadow-sm"
-                  : "text-[#f5f2ed]/60 hover:text-[#f5f2ed]"
+                  ? "bg-[#6C5CE7] text-white shadow-sm"
+                  : "text-[#A1A1AA] hover:text-white"
               }`}
             >
-              <Briefcase className="h-3 w-3" />
+              <Briefcase className="h-3.5 w-3.5" />
               Brand Engine
             </button>
             <button
@@ -106,44 +116,56 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setPerspective("creator");
                 setActiveTab("creator-portal");
               }}
-              className={`flex items-center gap-1.5 rounded-sm px-3 py-1 text-[10px] uppercase tracking-[0.15em] font-medium transition-all ${
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-all ${
                 perspective === "creator"
-                  ? "bg-[#c5a059] text-black font-semibold shadow-sm"
-                  : "text-[#f5f2ed]/60 hover:text-[#f5f2ed]"
+                  ? "bg-[#6C5CE7] text-white shadow-sm"
+                  : "text-[#A1A1AA] hover:text-white"
               }`}
             >
-              <UserCheck className="h-3 w-3" />
+              <UserCheck className="h-3.5 w-3.5" />
               Creator Portal
             </button>
           </div>
         </div>
 
         {/* Primary Navigation Tabs */}
-        <nav className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-1">
+        <nav className="flex items-center gap-1 overflow-x-auto py-1">
           <button
-            onClick={() => setActiveTab("directory")}
-            className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium transition-all ${
-              activeTab === "directory"
-                ? "border border-[#c5a059] bg-[#c5a059]/10 text-[#c5a059]"
-                : "text-[#f5f2ed]/60 hover:text-[#f5f2ed] border border-transparent"
+            onClick={() => setActiveTab("landing")}
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
+              activeTab === "landing"
+                ? "bg-[#6C5CE7]/15 text-[#6C5CE7] border border-[#6C5CE7]/40 shadow-sm"
+                : "text-[#A1A1AA] hover:text-white border border-transparent"
             }`}
           >
-            <Layers className="h-3.5 w-3.5 text-[#c5a059]" />
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Overview</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("directory")}
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
+              activeTab === "directory"
+                ? "bg-[#6C5CE7]/15 text-[#6C5CE7] border border-[#6C5CE7]/40 shadow-sm"
+                : "text-[#A1A1AA] hover:text-white border border-transparent"
+            }`}
+          >
+            <Layers className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Directory</span>
           </button>
 
           <button
             onClick={() => setActiveTab("requests")}
-            className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium transition-all relative ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all relative ${
               activeTab === "requests"
-                ? "border border-[#c5a059] bg-[#c5a059]/10 text-[#c5a059]"
-                : "text-[#f5f2ed]/60 hover:text-[#f5f2ed] border border-transparent"
+                ? "bg-[#6C5CE7]/15 text-[#6C5CE7] border border-[#6C5CE7]/40 shadow-sm"
+                : "text-[#A1A1AA] hover:text-white border border-transparent"
             }`}
           >
-            <Inbox className="h-3.5 w-3.5 text-[#c5a059]" />
+            <Inbox className="h-3.5 w-3.5" />
             <span>Requests</span>
             {pendingRequestsCount > 0 && (
-              <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-black">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#6C5CE7] text-[10px] font-bold text-white">
                 {pendingRequestsCount}
               </span>
             )}
@@ -151,28 +173,28 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => setActiveTab("decision-engine")}
-            className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
               activeTab === "decision-engine"
-                ? "border border-[#c5a059] bg-[#c5a059]/10 text-[#c5a059]"
-                : "text-[#f5f2ed]/60 hover:text-[#f5f2ed] border border-transparent"
+                ? "bg-[#6C5CE7]/15 text-[#6C5CE7] border border-[#6C5CE7]/40 shadow-sm"
+                : "text-[#A1A1AA] hover:text-white border border-transparent"
             }`}
           >
-            <Sparkles className="h-3.5 w-3.5 text-[#c5a059]" />
-            <span className="hidden md:inline">AI</span> Engine
+            <BarChart3 className="h-3.5 w-3.5" />
+            <span className="hidden md:inline">Decision</span> Engine
           </button>
 
           <button
             onClick={() => setActiveTab("deal-room")}
-            className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium transition-all relative ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all relative ${
               activeTab === "deal-room"
-                ? "border border-[#c5a059] bg-[#c5a059]/10 text-[#c5a059]"
-                : "text-[#f5f2ed]/60 hover:text-[#f5f2ed] border border-transparent"
+                ? "bg-[#6C5CE7]/15 text-[#6C5CE7] border border-[#6C5CE7]/40 shadow-sm"
+                : "text-[#A1A1AA] hover:text-white border border-transparent"
             }`}
           >
-            <ShieldCheck className="h-3.5 w-3.5 text-[#c5a059]" />
+            <ShieldCheck className="h-3.5 w-3.5" />
             <span>Deal Room</span>
             {activeDealsCount > 0 && (
-              <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#c5a059] text-[9px] font-bold text-black">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#6C5CE7] text-[10px] font-bold text-white">
                 {activeDealsCount}
               </span>
             )}
@@ -180,77 +202,53 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => setActiveTab("performance")}
-            className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
               activeTab === "performance"
-                ? "border border-[#c5a059] bg-[#c5a059]/10 text-[#c5a059]"
-                : "text-[#f5f2ed]/60 hover:text-[#f5f2ed] border border-transparent"
+                ? "bg-[#6C5CE7]/15 text-[#6C5CE7] border border-[#6C5CE7]/40 shadow-sm"
+                : "text-[#A1A1AA] hover:text-white border border-transparent"
             }`}
           >
-            <BarChart3 className="h-3.5 w-3.5 text-[#c5a059]" />
+            <BarChart3 className="h-3.5 w-3.5" />
             <span>KPI Tracker</span>
           </button>
 
           <button
             onClick={() => setActiveTab("database")}
-            className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium transition-all relative ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all relative ${
               activeTab === "database"
-                ? "border border-[#3ECF8E] bg-[#3ECF8E]/10 text-[#3ECF8E]"
-                : "text-[#f5f2ed]/60 hover:text-[#f5f2ed] border border-transparent"
+                ? "bg-[#3ECF8E]/15 text-[#3ECF8E] border border-[#3ECF8E]/40"
+                : "text-[#A1A1AA] hover:text-white border border-transparent"
             }`}
             title="View PostgreSQL Relational Tables in Supabase"
           >
             <Database className="h-3.5 w-3.5 text-[#3ECF8E]" />
-            <span className="font-semibold">Supabase Tables</span>
-            <span className="flex h-3.5 px-1 items-center justify-center rounded-full bg-[#3ECF8E]/20 text-[#3ECF8E] text-[9px] font-bold">
+            <span className="hidden lg:inline font-semibold">Supabase</span>
+            <span className="flex h-4 px-1 items-center justify-center rounded-full bg-[#3ECF8E]/20 text-[#3ECF8E] text-[10px] font-bold">
               4
             </span>
-          </button>
-
-          <button
-            onClick={() => {
-              setActiveTab("creator-portal");
-              setPerspective("creator");
-            }}
-            className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium transition-all ${
-              activeTab === "creator-portal"
-                ? "border border-[#c5a059] bg-[#c5a059]/10 text-[#c5a059]"
-                : "text-[#f5f2ed]/60 hover:text-[#f5f2ed] border border-transparent"
-            }`}
-          >
-            <UserCheck className="h-3.5 w-3.5 text-[#c5a059]" />
-            <span className="hidden md:inline">Availability &</span> Rates
           </button>
         </nav>
 
         {/* Action Controls & Integrations */}
-        <div className="flex items-center gap-3">
-          {/* Add Creator Button - Exact theme button style */}
+        <div className="flex items-center gap-2.5">
+          {/* Download CSV Dataset Button */}
           <button
-            onClick={onOpenAddCreatorModal}
-            className="flex items-center gap-1.5 rounded-sm border border-[#c5a059] px-4 py-2 text-[10px] uppercase tracking-widest text-[#c5a059] transition-all hover:bg-[#c5a059] hover:text-black font-medium"
-            title="Add or import verified YouTube creator"
+            onClick={handleDownloadCsv}
+            className="hidden sm:flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-white/90 hover:bg-white/10 hover:border-[#6C5CE7]/40 transition-all"
+            title="Download CSV file with all 24 YouTube creators & analytics"
           >
-            <Plus className="h-3 w-3" />
-            <span className="hidden sm:inline">Add Creator</span>
+            <Download className="h-3.5 w-3.5 text-[#6C5CE7]" />
+            <span className="hidden md:inline">Export CSV</span>
           </button>
 
-          {/* Supabase Storage Integration Badge & Trigger */}
+          {/* Add Creator Button */}
           <button
-            onClick={() => setActiveTab("database")}
-            className={`flex items-center gap-1.5 rounded-sm border px-3 py-2 text-[10px] uppercase tracking-wider font-medium transition-all ${
-              supabaseConfig.isConnected
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                : "border-white/10 bg-[#0a0a0a] text-[#f5f2ed]/60 hover:border-white/20 hover:text-[#f5f2ed]"
-            }`}
-            title="Open Supabase Cloud Database Explorer"
+            onClick={onOpenAddCreatorModal}
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#6C5CE7] to-[#5B21B6] px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-[#6C5CE7]/25 hover:shadow-[#6C5CE7]/40 transition-all"
+            title="Add or import verified YouTube creator"
           >
-            <Database className="h-3.5 w-3.5 text-[#3ECF8E]" />
-            <span className="hidden sm:inline">Supabase</span>
-            {supabaseConfig.isConnected ? (
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            ) : (
-              <span className="text-[9px] text-[#f5f2ed]/40">4 Tables</span>
-            )}
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Add Creator</span>
           </button>
         </div>
       </div>

@@ -18,6 +18,8 @@ import {
   LayoutGrid,
   ListFilter,
   ArrowUpDown,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react";
 import { Creator, CreatorNiche } from "../types";
 
@@ -291,7 +293,7 @@ export const CreatorDirectory: React.FC<CreatorDirectoryProps> = ({
                 onClick={() => setViewMode("grid")}
                 className={`rounded-sm p-1.5 transition-colors ${
                   viewMode === "grid"
-                    ? "bg-[#c5a059] text-black"
+                    ? "bg-[#6C5CE7] text-white"
                     : "text-white/40 hover:text-white"
                 }`}
                 title="Grid View"
@@ -302,7 +304,7 @@ export const CreatorDirectory: React.FC<CreatorDirectoryProps> = ({
                 onClick={() => setViewMode("table")}
                 className={`rounded-sm p-1.5 transition-colors ${
                   viewMode === "table"
-                    ? "bg-[#c5a059] text-black"
+                    ? "bg-[#6C5CE7] text-white"
                     : "text-white/40 hover:text-white"
                 }`}
                 title="Institutional Table View"
@@ -310,6 +312,17 @@ export const CreatorDirectory: React.FC<CreatorDirectoryProps> = ({
                 <ListFilter className="h-3.5 w-3.5" />
               </button>
             </div>
+
+            {/* Export CSV Dataset Button */}
+            <a
+              href="/api/creators/export-csv"
+              download="ciphercollab_creators_intelligence.csv"
+              className="flex items-center gap-1.5 rounded-sm border border-[#6C5CE7]/40 bg-[#6C5CE7]/10 px-3 py-2 text-[10px] uppercase tracking-wider font-medium text-[#A78BFA] hover:bg-[#6C5CE7]/20 transition-colors"
+              title="Download full CSV dataset with all creator analytics"
+            >
+              <Download className="h-3.5 w-3.5 text-[#6C5CE7]" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </a>
           </div>
         </div>
 

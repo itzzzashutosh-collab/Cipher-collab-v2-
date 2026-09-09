@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   ShieldCheck,
@@ -19,11 +19,16 @@ import {
   Users,
   Briefcase,
   Layers,
+  Activity,
+  Zap,
 } from "lucide-react";
-import { Creator } from "../types";
+import { Creator, CreatorMarketplaceIntelligence } from "../types";
+import { CreatorAnalyticsCharts } from "./CreatorAnalyticsCharts";
+import { fetchCreatorMarketplaceIntelligence } from "../lib/marketplaceIntelligence";
 
 interface CreatorDetailModalProps {
   creator: Creator | null;
+  allCreators?: Creator[];
   onClose: () => void;
   onInitiateCollab: (creator: Creator) => void;
   onOpenCollabRequest?: (creator: Creator) => void;
@@ -31,14 +36,54 @@ interface CreatorDetailModalProps {
 
 export const CreatorDetailModal: React.FC<CreatorDetailModalProps> = ({
   creator,
+  allCreators = [],
   onClose,
   onInitiateCollab,
   onOpenCollabRequest,
 }) => {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [aiEvaluation, setAiEvaluation] = useState<any | null>(null);
+  const [intelligence, setIntelligence] = useState<CreatorMarketplaceIntelligence | null>(null);
+  const [isRefreshingIntelligence, setIsRefreshingIntelligence] = useState(false);
+  const [activeDossierTab, setActiveDossierTab] = useState<"charts" | "rates" | "audience" | "calendar">("charts");
+
+  useEffect(() => {
+    if (!creator) {
+      setIntelligence(null);
+      return;
+    }
+
+    let isMounted = true;
+    fetchCreatorMarketplaceIntelligence(creator, { peerPool: allCreators })
+      .then((data) => {
+        if (isMounted) {
+          setIntelligence(data);
+        }
+      })
+      .catch((err) => console.warn("Could not fetch marketplace intelligence:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, [creator?.id]);
 
   if (!creator) return null;
+
+  const handleRefreshIntelligence = async () => {
+    if (!creator) return;
+    setIsRefreshingIntelligence(true);
+    try {
+      const fresh = await fetchCreatorMarketplaceIntelligence(
+        creator,
+        { peerPool: allCreators, forceRefresh: true }
+      );
+      setIntelligence(fresh);
+    } catch (err) {
+      console.error("Refresh failed:", err);
+    } finally {
+      setIsRefreshingIntelligence(false);
+    }
+  };
 
   const handleRunAiEvaluation = async () => {
     setIsEvaluating(true);
@@ -176,10 +221,76 @@ export const CreatorDetailModal: React.FC<CreatorDetailModalProps> = ({
             </div>
           </div>
 
+          {/* Dossier Navigation Segmented Tabs */}
+          <div className="mt-6 flex flex-wrap items-center gap-2 border-b border-white/10 pb-3">
+            <button
+              onClick={() => setActiveDossierTab("charts")}
+              className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold tracking-wide transition-all ${
+                activeDossierTab === "charts"
+                  ? "bg-[#6C5CE7] text-white shadow-lg shadow-[#6C5CE7]/25"
+                  : "bg-white/5 text-[#A1A1AA] hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <BarChart3 className="h-3.5 w-3.5" />
+              <span>YouTube Analytics & Growth Charts</span>
+              <span className="rounded-full bg-white/20 px-1.5 py-0.2 text-[9px] font-bold uppercase">
+                Recharts
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveDossierTab("rates")}
+              className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium tracking-wide transition-all ${
+                activeDossierTab === "rates"
+                  ? "bg-[#6C5CE7] text-white shadow-lg shadow-[#6C5CE7]/25"
+                  : "bg-white/5 text-[#A1A1AA] hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <DollarSign className="h-3.5 w-3.5" />
+              <span>Institutional Rate Card</span>
+            </button>
+
+            <button
+              onClick={() => setActiveDossierTab("audience")}
+              className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium tracking-wide transition-all ${
+                activeDossierTab === "audience"
+                  ? "bg-[#6C5CE7] text-white shadow-lg shadow-[#6C5CE7]/25"
+                  : "bg-white/5 text-[#A1A1AA] hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <Users className="h-3.5 w-3.5" />
+              <span>Audience Demographics</span>
+            </button>
+
+            <button
+              onClick={() => setActiveDossierTab("calendar")}
+              className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium tracking-wide transition-all ${
+                activeDossierTab === "calendar"
+                  ? "bg-[#6C5CE7] text-white shadow-lg shadow-[#6C5CE7]/25"
+                  : "bg-white/5 text-[#A1A1AA] hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <Calendar className="h-3.5 w-3.5" />
+              <span>Availability & Slots</span>
+            </button>
+          </div>
+
+          {/* Dedicated Recharts Analytics Charts Section */}
+          {activeDossierTab === "charts" && (
+            <div className="mt-6">
+              <CreatorAnalyticsCharts
+                creator={creator}
+                intelligence={intelligence || undefined}
+                onRefresh={handleRefreshIntelligence}
+                isRefreshing={isRefreshingIntelligence}
+              />
+            </div>
+          )}
+
           {/* Tabbed / Segmented Sections */}
-          <div className="mt-6 space-y-6">
+          <div className={`mt-6 space-y-6 ${activeDossierTab === "charts" ? "hidden" : "block"}`}>
             {/* Section 1: Standardized Rate Card Matrix */}
-            <div className="rounded-sm border border-white/10 bg-[#050505] p-5">
+            <div className={`rounded-xl border border-white/10 bg-[#0E0E12] p-5 shadow-lg ${activeDossierTab === "rates" ? "ring-1 ring-[#6C5CE7]/30" : ""}`}>
               <div className="flex items-center justify-between pb-3 border-b border-white/5">
                 <div>
                   <h3 className="font-serif text-base font-light text-[#f5f2ed]">

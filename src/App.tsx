@@ -16,6 +16,7 @@ import { CollaborationRequestModal } from "./components/CollaborationRequestModa
 import { CollaborationRequestsHub } from "./components/CollaborationRequestsHub";
 import { PerformanceDashboard } from "./components/PerformanceDashboard";
 import { SupabaseTableView } from "./components/SupabaseTableView";
+import { SaaSExperience } from "./components/SaaSExperience";
 import {
   Creator,
   CollaborationDeal,
@@ -44,7 +45,7 @@ const LOCAL_STORAGE_KEY_KPIS = "ciphercollab_kpis_v1";
 
 export default function App() {
   // Navigation & Perspective
-  const [activeTab, setActiveTab] = useState<NavTabType>("directory");
+  const [activeTab, setActiveTab] = useState<NavTabType>("landing");
   const [perspective, setPerspective] = useState<"brand" | "creator">("brand");
 
   // Core Data State (Loaded from LocalStorage or Initial Mock)
@@ -376,81 +377,99 @@ export default function App() {
       />
 
       {/* Main Viewport Container */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
-        {activeTab === "directory" && (
-          <CreatorDirectory
-            creators={creators}
-            onSelectCreator={(c) => setSelectedCreatorForModal(c)}
-            onInitiateCollab={handleInitiateCollabFromDirectory}
-            onRunAiEvaluation={(c) => setSelectedCreatorForModal(c)}
-            onPerformYouTubeLiveSearch={handlePerformYouTubeLiveSearch}
-            isSearchingYouTube={isSearchingYouTube}
-          />
-        )}
+      {activeTab === "landing" ? (
+        <SaaSExperience
+          creators={creators}
+          onSelectCreator={(c) => setSelectedCreatorForModal(c)}
+          onExplorePlatform={() => setActiveTab("directory")}
+          onRequestAccess={() => {
+            setCollabRequestTargetCreator(creators[0]);
+            setIsCollabRequestModalOpen(true);
+          }}
+          onOpenDealRoom={() => setActiveTab("deal-room")}
+          onOpenCreatorPortal={() => {
+            setPerspective("creator");
+            setActiveTab("creator-portal");
+          }}
+        />
+      ) : (
+        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
+          {activeTab === "directory" && (
+            <CreatorDirectory
+              creators={creators}
+              onSelectCreator={(c) => setSelectedCreatorForModal(c)}
+              onInitiateCollab={handleInitiateCollabFromDirectory}
+              onRunAiEvaluation={(c) => setSelectedCreatorForModal(c)}
+              onPerformYouTubeLiveSearch={handlePerformYouTubeLiveSearch}
+              isSearchingYouTube={isSearchingYouTube}
+            />
+          )}
 
-        {activeTab === "requests" && (
-          <CollaborationRequestsHub
-            requests={requests}
-            creators={creators}
-            perspective={perspective}
-            onUpdateRequest={handleUpdateRequest}
-            onCreateDealFromRequest={handleCreateDealFromRequest}
-            onOpenNewRequestModal={handleOpenNewRequestModal}
-          />
-        )}
+          {activeTab === "requests" && (
+            <CollaborationRequestsHub
+              requests={requests}
+              creators={creators}
+              perspective={perspective}
+              onUpdateRequest={handleUpdateRequest}
+              onCreateDealFromRequest={handleCreateDealFromRequest}
+              onOpenNewRequestModal={handleOpenNewRequestModal}
+            />
+          )}
 
-        {activeTab === "decision-engine" && (
-          <BrandDecisionEngine
-            creators={creators}
-            onSelectCreatorForDeal={handleSelectCreatorForDealFromEngine}
-          />
-        )}
+          {activeTab === "decision-engine" && (
+            <BrandDecisionEngine
+              creators={creators}
+              onSelectCreatorForDeal={handleSelectCreatorForDealFromEngine}
+            />
+          )}
 
-        {activeTab === "deal-room" && (
-          <DealRoom
-            deals={deals}
-            creators={creators}
-            onUpdateDeal={handleUpdateDeal}
-            onCreateNewDeal={handleCreateNewDeal}
-            selectedDealId={selectedDealId}
-          />
-        )}
+          {activeTab === "deal-room" && (
+            <DealRoom
+              deals={deals}
+              creators={creators}
+              onUpdateDeal={handleUpdateDeal}
+              onCreateNewDeal={handleCreateNewDeal}
+              selectedDealId={selectedDealId}
+            />
+          )}
 
-        {activeTab === "performance" && (
-          <PerformanceDashboard
-            campaigns={campaigns}
-            creators={creators}
-            perspective={perspective}
-            onUpdateCampaign={handleUpdateCampaign}
-            onAddCampaign={handleAddCampaign}
-          />
-        )}
+          {activeTab === "performance" && (
+            <PerformanceDashboard
+              campaigns={campaigns}
+              creators={creators}
+              perspective={perspective}
+              onUpdateCampaign={handleUpdateCampaign}
+              onAddCampaign={handleAddCampaign}
+            />
+          )}
 
-        {activeTab === "creator-portal" && (
-          <CreatorPortal
-            creators={creators}
-            deals={deals}
-            onUpdateCreator={handleUpdateCreator}
-            onUpdateDeal={handleUpdateDeal}
-          />
-        )}
+          {activeTab === "creator-portal" && (
+            <CreatorPortal
+              creators={creators}
+              deals={deals}
+              onUpdateCreator={handleUpdateCreator}
+              onUpdateDeal={handleUpdateDeal}
+            />
+          )}
 
-        {activeTab === "database" && (
-          <SupabaseTableView
-            creators={creators}
-            deals={deals}
-            requests={requests}
-            campaigns={campaigns}
-            config={supabaseConfig}
-            onSaveConfig={handleSaveSupabaseConfig}
-            onDataImported={handleDataImported}
-          />
-        )}
-      </main>
+          {activeTab === "database" && (
+            <SupabaseTableView
+              creators={creators}
+              deals={deals}
+              requests={requests}
+              campaigns={campaigns}
+              config={supabaseConfig}
+              onSaveConfig={handleSaveSupabaseConfig}
+              onDataImported={handleDataImported}
+            />
+          )}
+        </main>
+      )}
 
       {/* Creator Detail Dossier Modal */}
       <CreatorDetailModal
         creator={selectedCreatorForModal}
+        allCreators={creators}
         onClose={() => setSelectedCreatorForModal(null)}
         onInitiateCollab={handleInitiateCollabFromDirectory}
         onOpenCollabRequest={(c) => handleOpenNewRequestModal(c)}
